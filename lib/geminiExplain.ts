@@ -1,5 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
-import { getEnv } from './env';
+import { generateAiContent } from './ai';
 import { getFirestore } from './firebase';
 
 export const MEDICAL_DISCLAIMER =
@@ -65,30 +64,19 @@ export async function explainMedication(
     console.warn('Medication cache lookup warning:', err);
   }
 
-  // 2. Fetch from Gemini
-  const env = getEnv();
-  const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
-  const model = env.GEMINI_MODEL || 'gemini-2.5-flash';
-
-  const response = await ai.models.generateContent({
-    model,
-    contents: [
-      {
-        role: 'user',
-        parts: [
-          {
-            text: `Please explain this medication: ${cleanName}`,
-          },
-        ],
-      },
-    ],
-    config: {
+  // 2. Fetch from AI (OpenRouter or Gemini)
+  let rawSummary = '';
+  try {
+    rawSummary = await generateAiContent({
+      prompt: `Please explain this medication: ${cleanName}`,
       systemInstruction: SYSTEM_INSTRUCTION,
       temperature: 0.2,
-    },
-  });
+      maxTokens: 500,
+    });
+  } catch (err) {
+    console.warn('AI explanation error, falling back to label guidance:', err);
+  }
 
-  const rawSummary = typeof response.text === 'string' ? response.text : '';
   const summary =
     rawSummary.trim() ||
     `${cleanName} is commonly prescribed by healthcare providers. Please review your prescription label for instructions.`;

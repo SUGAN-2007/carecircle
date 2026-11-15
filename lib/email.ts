@@ -15,8 +15,8 @@ export function getEmailTransporter(): Transporter {
     port: env.SMTP_PORT,
     secure: env.SMTP_PORT === 465, // true for 465, false for 587 / STARTTLS
     auth: {
-      user: env.SMTP_USER,
-      pass: env.SMTP_PASS,
+      user: env.resolvedSmtpUser,
+      pass: env.resolvedSmtpPass,
     },
   });
 
@@ -39,7 +39,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
   const env = getEnv();
   const transport = getEmailTransporter();
 
-  const fromAddress = options.from || `"CareCircle" <${env.SMTP_USER}>`;
+  const fromAddress = options.from || `"CareCircle" <${env.resolvedSmtpUser}>`;
 
   const info = await transport.sendMail({
     from: fromAddress,

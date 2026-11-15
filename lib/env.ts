@@ -17,20 +17,27 @@ const envSchema = z.object({
   /** Firebase service account as a JSON string (copy the JSON, minify, paste). */
   FIREBASE_SERVICE_ACCOUNT_JSON: z.string().min(10),
 
-  /** Google Gemini API key */
-  GEMINI_API_KEY: z.string().min(10),
+  /** Google Gemini API key (optional if OPENROUTER_API_KEY is provided) */
+  GEMINI_API_KEY: z.string().optional(),
+
+  /** OpenRouter API key for unified LLM access */
+  OPENROUTER_API_KEY: z.string().optional(),
+
+  /** OpenRouter model name (e.g. google/gemini-2.5-flash) */
+  OPENROUTER_MODEL: z.string().default('google/gemini-2.5-flash'),
 
   /** Gemini model name for natural-language parsing and digests */
   GEMINI_MODEL: z.string().default('gemini-2.5-flash'),
 
-  /** Outbound SMTP credentials for Nodemailer */
-  SMTP_HOST: z.string().min(1),
+  /** Outbound SMTP credentials for Nodemailer (defaults to Gmail SMTP) */
+  SMTP_HOST: z.string().default('smtp.gmail.com'),
   SMTP_PORT: z
-    .string()
-    .regex(/^\d+$/, 'SMTP_PORT must be a numeric string')
-    .transform(Number),
-  SMTP_USER: z.string().min(1),
-  SMTP_PASS: z.string().min(1),
+    .union([z.string().regex(/^\d+$/).transform(Number), z.number()])
+    .default(465),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  EMAIL_USER: z.string().optional(),
+  EMAIL_PASS: z.string().optional(),
 
   /**
    * Session cookie signing secret.
@@ -59,12 +66,15 @@ const envSchema = z.object({
     .default('development'),
 });
 
-export type Env = z.infer<typeof envSchema>;
+export type Env = z.infer<typeof envSchema> & {
+  resolvedSmtpUser: string;
+  resolvedSmtpPass: string;
+};
 
 let _env: Env | null = null;
 
 /**
- * Returns the validated environment.  Throws on the first call if any
+ * Returns the validated environment. Throws on the first call if any
  * required variable is missing or invalid.
  */
 export function getEnv(): Env {
@@ -83,6 +93,21 @@ export function getEnv(): Env {
     );
   }
 
-  _env = result.data;
+  const data = result.data;
+
+  // Verify at least one AI key is present
+  if (!data.GEMINI_API_KEY && !data.OPENROUTER_API_KEY) {
+    throw new Error('Either GEMINI_API_KEY or OPENROUTER_API_KEY must be provided.');
+  }
+
+  const resolvedSmtpUser = data.SMTP_USER || data.EMAIL_USER || '';
+  const resolvedSmtpPass = (data.SMTP_PASS || data.EMAIL_PASS || '').replace(/\s+/g, '');
+
+  _env = {
+    ...data,
+    resolvedSmtpUser,
+    resolvedSmtpPass,
+  };
+
   return _env;
 }

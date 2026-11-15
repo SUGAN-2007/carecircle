@@ -4,7 +4,9 @@ node_modules/
 # Next.js build output
 .next/
 out/
-
+.agents/
+.lib/
+.tests/
 # Environment files — NEVER commit real secrets
 .env
 .env.local

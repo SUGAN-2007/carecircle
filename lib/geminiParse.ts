@@ -1,6 +1,5 @@
-import { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
-import { getEnv } from './env';
+import { generateAiContent } from './ai';
 
 export const parsedMedicationSchema = z.object({
   name: z.string().trim().min(1, 'Medication name is required').max(100),
@@ -67,61 +66,23 @@ export async function parseMedicationWithGemini(
     };
   }
 
-  const env = getEnv();
-  const apiKey = env.GEMINI_API_KEY;
-  const model = env.GEMINI_MODEL || 'gemini-2.5-flash';
   const todayStr = options?.todayStr || new Date().toISOString().split('T')[0];
   const timeoutMs = options?.timeoutMs || 9000;
 
   try {
-    const ai = new GoogleGenAI({ apiKey });
-
     // Enforce strict timeout
     const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Gemini parse request timed out')), timeoutMs),
+      setTimeout(() => reject(new Error('AI parse request timed out')), timeoutMs),
     );
 
-    const generatePromise = ai.models.generateContent({
-      model,
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            {
-              text: `Reference Today Date: ${todayStr}\n\nUnstructured Medication Text:\n"""\n${trimmed}\n"""`,
-            },
-          ],
-        },
-      ],
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: 'object',
-          properties: {
-            name: { type: 'string', description: 'Name of the medication' },
-            dose: { type: 'string', description: 'Dosage and strength (e.g. 500mg once daily)' },
-            scheduleTimes: {
-              type: 'array',
-              items: { type: 'string', description: 'HH:mm in 24-hour time' },
-              description: 'Array of scheduled dose times',
-            },
-            withFood: { type: 'boolean', description: 'Whether to take with food' },
-            startDate: { type: 'string', description: 'Start date in YYYY-MM-DD' },
-            endDate: {
-              type: 'string',
-              nullable: true,
-              description: 'End date in YYYY-MM-DD, or null if ongoing',
-            },
-            pillCount: { type: 'integer', description: 'Number of pills in supply' },
-          },
-          required: ['name', 'dose', 'scheduleTimes', 'withFood', 'startDate', 'pillCount'],
-        },
-      },
+    const generatePromise = generateAiContent({
+      prompt: `Reference Today Date: ${todayStr}\n\nExtract the medication information into JSON with keys: name (string), dose (string), scheduleTimes (array of HH:mm strings), withFood (boolean), startDate (YYYY-MM-DD), endDate (YYYY-MM-DD or null), pillCount (integer).\n\nUnstructured Medication Text:\n"""\n${trimmed}\n"""\n\nReturn valid JSON only.`,
+      systemInstruction: SYSTEM_INSTRUCTION,
+      jsonFormat: true,
+      maxTokens: 1000,
     });
 
-    const response = await Promise.race([generatePromise, timeoutPromise]);
-    const responseText = typeof response.text === 'string' ? response.text : '';
+    const responseText = await Promise.race([generatePromise, timeoutPromise]);
 
     if (!responseText) {
       return { success: false, error: 'Could not understand, please try again.' };

@@ -1,7 +1,6 @@
 import { formatInTimeZone } from 'date-fns-tz';
-import { GoogleGenAI } from '@google/genai';
+import { generateAiContent } from './ai';
 import { getFirestore } from './firebase';
-import { getEnv } from './env';
 import { sendEmail } from './email';
 import { calculateAdherence, type AdherenceStats } from './adherence';
 import { appendAuditLog } from './auditLog';
@@ -28,10 +27,6 @@ export async function generateDigestNarrative(params: {
   const fallback = `${elderName} achieved a ${stats.rate}% adherence rate over the last 7 days, successfully taking ${stats.taken} out of ${stats.totalDue} scheduled doses.`;
 
   try {
-    const env = getEnv();
-    const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
-    const model = env.GEMINI_MODEL || 'gemini-2.5-flash';
-
     const prompt = `Elder Name: ${elderName}
 Adherence Rate: ${stats.rate}%
 Doses Taken: ${stats.taken}
@@ -39,28 +34,16 @@ Doses Skipped: ${stats.skipped}
 Doses Missed: ${stats.missed}
 Total Doses Scheduled: ${stats.totalDue}`;
 
-    const response = await ai.models.generateContent({
-      model,
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: prompt }],
-        },
-      ],
-      config: {
-        systemInstruction: `
-You are an empathetic family health assistant for CareCircle.
-Write a warm, 2-3 sentence weekly summary for the family based on the provided numbers.
-CRITICAL CONSTRAINT: Do NOT invent, guess, modify, or add any numbers or statistics. Refer strictly to the exact numbers provided.
-`,
-        temperature: 0.3,
-      },
+    const narrative = await generateAiContent({
+      prompt,
+      systemInstruction: `You are an empathetic family health assistant for CareCircle. Write a warm, 2-3 sentence weekly summary for the family based on the provided numbers. CRITICAL CONSTRAINT: Do NOT invent, guess, modify, or add any numbers or statistics. Refer strictly to the exact numbers provided.`,
+      temperature: 0.3,
+      maxTokens: 500,
     });
 
-    const narrative = typeof response.text === 'string' ? response.text : '';
     return narrative.trim() || fallback;
   } catch (err) {
-    console.warn('Gemini digest narrative fallback triggered:', err);
+    console.warn('AI digest narrative fallback triggered:', err);
     return fallback;
   }
 }
