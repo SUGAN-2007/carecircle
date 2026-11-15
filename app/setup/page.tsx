@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { UserIcon, CheckCircleIcon, AlertCircleIcon, ShieldCheckIcon } from '@/components/icons';
 
 interface Credentials {
   elderPasscode: string;
@@ -84,14 +85,16 @@ export default function SetupPage() {
     return (
       <main
         id="main-content"
-        className="min-h-screen flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100"
+        className="min-h-screen flex items-center justify-center p-4 bg-[#F0F9FF] dark:bg-[#0B132B] text-slate-900 dark:text-slate-100"
       >
-        <div className="w-full max-w-xl bg-white dark:bg-slate-900 rounded-3xl p-8 sm:p-10 shadow-xl border-4 border-green-600 dark:border-green-500 space-y-6">
+        <div className="w-full max-w-xl bg-white dark:bg-[#16223F] rounded-3xl p-8 sm:p-10 shadow-lg border-2 border-slate-400 dark:border-slate-500 space-y-6">
           <header className="text-center">
-            <span aria-hidden="true" className="text-5xl block mb-2">
-              🎉
-            </span>
-            <h1 className="text-3xl font-extrabold text-green-700 dark:text-green-400">
+            <div className="flex justify-center mb-3">
+              <div className="w-16 h-16 rounded-2xl bg-green-100 dark:bg-green-950/80 border-2 border-green-600 dark:border-green-400 flex items-center justify-center text-green-700 dark:text-green-300">
+                <CheckCircleIcon className="w-10 h-10" />
+              </div>
+            </div>
+            <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-50 tracking-tight">
               Profile Created!
             </h1>
             <p className="mt-2 text-xl font-medium text-slate-700 dark:text-slate-300">
@@ -101,45 +104,48 @@ export default function SetupPage() {
 
           <div
             role="alert"
-            className="p-4 bg-amber-100 dark:bg-amber-950/70 border-2 border-amber-600 text-amber-950 dark:text-amber-200 rounded-2xl text-lg font-medium"
+            className="p-4 bg-amber-50 dark:bg-amber-950/80 border-2 border-amber-600 dark:border-amber-500 text-amber-950 dark:text-amber-100 rounded-2xl text-lg font-semibold flex items-start gap-3"
           >
-            ⚠️ For your security, these passcodes will <strong>never</strong> be shown
-            again and cannot be emailed.
+            <AlertCircleIcon className="w-6 h-6 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+            <span>
+              For your security, these passcodes will <strong>never</strong> be shown
+              again and cannot be emailed.
+            </span>
           </div>
 
           <div className="space-y-4">
-            <div className="p-4 bg-slate-100 dark:bg-slate-800 rounded-2xl border-2 border-slate-300 dark:border-slate-700">
-              <span className="block text-base font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+            <div className="p-5 bg-sky-50 dark:bg-sky-950/50 rounded-2xl border-2 border-sky-400 dark:border-sky-600">
+              <span className="block text-base font-bold text-sky-800 dark:text-sky-300 uppercase tracking-wider">
                 Profile Code (Shared with all members)
               </span>
-              <span className="block text-3xl font-mono font-extrabold text-blue-700 dark:text-blue-300 mt-1 select-all">
+              <span className="block text-3xl font-mono font-black text-sky-900 dark:text-sky-100 mt-1 select-all">
                 {createdProfile.profileCode}
               </span>
             </div>
 
-            <div className="p-4 bg-slate-100 dark:bg-slate-800 rounded-2xl border-2 border-slate-300 dark:border-slate-700">
-              <span className="block text-base font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+            <div className="p-5 bg-slate-50 dark:bg-slate-900/80 rounded-2xl border-2 border-slate-400 dark:border-slate-600">
+              <span className="block text-base font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                 Elder Passcode (Full Control)
               </span>
-              <span className="block text-2xl font-mono font-bold text-slate-900 dark:text-slate-100 mt-1 select-all">
+              <span className="block text-2xl font-mono font-extrabold text-slate-950 dark:text-slate-50 mt-1 select-all">
                 {createdProfile.credentials.elderPasscode}
               </span>
             </div>
 
-            <div className="p-4 bg-slate-100 dark:bg-slate-800 rounded-2xl border-2 border-slate-300 dark:border-slate-700">
-              <span className="block text-base font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+            <div className="p-5 bg-slate-50 dark:bg-slate-900/80 rounded-2xl border-2 border-slate-400 dark:border-slate-600">
+              <span className="block text-base font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                 Caretaker Passcode (Propose Changes)
               </span>
-              <span className="block text-2xl font-mono font-bold text-slate-900 dark:text-slate-100 mt-1 select-all">
+              <span className="block text-2xl font-mono font-extrabold text-slate-950 dark:text-slate-50 mt-1 select-all">
                 {createdProfile.credentials.caretakerPasscode}
               </span>
             </div>
 
-            <div className="p-4 bg-slate-100 dark:bg-slate-800 rounded-2xl border-2 border-slate-300 dark:border-slate-700">
-              <span className="block text-base font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+            <div className="p-5 bg-slate-50 dark:bg-slate-900/80 rounded-2xl border-2 border-slate-400 dark:border-slate-600">
+              <span className="block text-base font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                 Family Passcode (View-Only)
               </span>
-              <span className="block text-2xl font-mono font-bold text-slate-900 dark:text-slate-100 mt-1 select-all">
+              <span className="block text-2xl font-mono font-extrabold text-slate-950 dark:text-slate-50 mt-1 select-all">
                 {createdProfile.credentials.familyPasscode}
               </span>
             </div>
@@ -148,7 +154,7 @@ export default function SetupPage() {
           <div className="pt-4">
             <Link
               href="/login"
-              className="w-full flex items-center justify-center min-h-[56px] text-xl font-bold rounded-2xl bg-green-700 hover:bg-green-800 text-white shadow-lg transition-colors duration-150 focus-visible:ring-4 focus-visible:ring-green-600"
+              className="w-full flex items-center justify-center min-h-[56px] text-xl font-black rounded-2xl bg-[#22C55E] dark:bg-[#4ADE80] hover:bg-[#16A34A] dark:hover:bg-[#22C55E] text-[#000000] border-2 border-[#15803D] dark:border-[#22C55E] shadow-sm transition-colors duration-150 motion-reduce:transition-none cursor-pointer focus-visible:ring-3 focus-visible:ring-offset-2 focus-visible:ring-sky-600 dark:focus-visible:ring-sky-400"
             >
               I Have Written These Down — Go to Sign In
             </Link>
@@ -161,17 +167,19 @@ export default function SetupPage() {
   return (
     <main
       id="main-content"
-      className="min-h-screen py-10 px-4 flex items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100"
+      className="min-h-screen py-10 px-4 flex items-center justify-center bg-[#F0F9FF] dark:bg-[#0B132B] text-slate-900 dark:text-slate-100"
     >
-      <div className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl p-8 sm:p-10 shadow-lg border-2 border-slate-200 dark:border-slate-800">
+      <div className="w-full max-w-2xl bg-white dark:bg-[#16223F] rounded-3xl p-8 sm:p-10 shadow-md border-2 border-slate-400 dark:border-slate-500">
         <header className="text-center mb-8">
-          <span aria-hidden="true" className="text-5xl block mb-2">
-            🌱
-          </span>
-          <h1 className="text-3xl font-extrabold tracking-tight">
+          <div className="flex justify-center mb-3">
+            <div className="w-16 h-16 rounded-2xl bg-sky-100 dark:bg-sky-950/80 border-2 border-sky-600 dark:border-sky-400 flex items-center justify-center text-sky-700 dark:text-sky-300">
+              <UserIcon className="w-9 h-9" />
+            </div>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50">
             Create CareCircle Profile
           </h1>
-          <p className="mt-2 text-lg text-slate-600 dark:text-slate-300">
+          <p className="mt-2 text-lg font-medium text-slate-700 dark:text-slate-300">
             Set up one shared healthcare profile for you, your caretaker, and family.
           </p>
         </header>
@@ -180,22 +188,26 @@ export default function SetupPage() {
           <div
             role="alert"
             aria-live="polite"
-            className="mb-6 p-4 rounded-2xl bg-red-100 dark:bg-red-950 border-2 border-red-500 text-red-900 dark:text-red-200 text-lg font-medium"
+            className="mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-950/90 border-2 border-red-600 dark:border-red-500 text-red-950 dark:text-red-100 text-lg font-semibold flex items-start gap-3"
           >
-            ⚠️ {error}
+            <AlertCircleIcon className="w-6 h-6 text-red-700 dark:text-red-400 shrink-0 mt-0.5" />
+            <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
           <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 border-b pb-2 border-slate-200 dark:border-slate-800">
-              1. Basic Information
-            </h2>
+            <div className="flex items-center gap-2 border-b-2 pb-2 border-slate-300 dark:border-slate-700">
+              <UserIcon className="w-6 h-6 text-sky-700 dark:text-sky-400" />
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                1. Basic Information
+              </h2>
+            </div>
 
             <div>
               <label
                 htmlFor="name"
-                className="block text-xl font-bold mb-1 text-slate-800 dark:text-slate-200"
+                className="block text-xl font-bold mb-1 text-slate-900 dark:text-slate-100"
               >
                 Elder&apos;s Full Name
               </label>
@@ -206,14 +218,14 @@ export default function SetupPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Margaret Smith"
-                className="w-full min-h-[52px] px-4 text-xl rounded-2xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus-visible:ring-4 focus-visible:ring-blue-600"
+                className="w-full min-h-[52px] px-4 text-xl font-semibold rounded-2xl border-2 border-slate-500 dark:border-slate-400 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus-visible:ring-3 focus-visible:ring-offset-2 focus-visible:ring-sky-600 dark:focus-visible:ring-sky-400 focus-visible:border-sky-600 transition-colors duration-150 motion-reduce:transition-none"
               />
             </div>
 
             <div>
               <label
                 htmlFor="timezone"
-                className="block text-xl font-bold mb-1 text-slate-800 dark:text-slate-200"
+                className="block text-xl font-bold mb-1 text-slate-900 dark:text-slate-100"
               >
                 Timezone
               </label>
@@ -221,7 +233,7 @@ export default function SetupPage() {
                 id="timezone"
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
-                className="w-full min-h-[52px] px-4 text-xl rounded-2xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus-visible:ring-4 focus-visible:ring-blue-600"
+                className="w-full min-h-[52px] px-4 text-xl font-semibold rounded-2xl border-2 border-slate-500 dark:border-slate-400 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus-visible:ring-3 focus-visible:ring-offset-2 focus-visible:ring-sky-600 dark:focus-visible:ring-sky-400 focus-visible:border-sky-600 transition-colors duration-150 motion-reduce:transition-none"
               >
                 <option value="Asia/Kolkata">Asia/Kolkata (IST - +05:30)</option>
                 <option value="America/New_York">America/New_York (EST/EDT)</option>
@@ -238,14 +250,17 @@ export default function SetupPage() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 border-b pb-2 border-slate-200 dark:border-slate-800">
-              2. Notification Emails
-            </h2>
+            <div className="flex items-center gap-2 border-b-2 pb-2 border-slate-300 dark:border-slate-700">
+              <ShieldCheckIcon className="w-6 h-6 text-sky-700 dark:text-sky-400" />
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                2. Notification Emails
+              </h2>
+            </div>
 
             <div>
               <label
                 htmlFor="emailElder"
-                className="block text-xl font-bold mb-1 text-slate-800 dark:text-slate-200"
+                className="block text-xl font-bold mb-1 text-slate-900 dark:text-slate-100"
               >
                 Elder Email (for reminders and approvals)
               </label>
@@ -256,14 +271,14 @@ export default function SetupPage() {
                 value={emailElder}
                 onChange={(e) => setEmailElder(e.target.value)}
                 placeholder="elder@example.com"
-                className="w-full min-h-[52px] px-4 text-xl rounded-2xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus-visible:ring-4 focus-visible:ring-blue-600"
+                className="w-full min-h-[52px] px-4 text-xl font-semibold rounded-2xl border-2 border-slate-500 dark:border-slate-400 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus-visible:ring-3 focus-visible:ring-offset-2 focus-visible:ring-sky-600 dark:focus-visible:ring-sky-400 focus-visible:border-sky-600 transition-colors duration-150 motion-reduce:transition-none"
               />
             </div>
 
             <div>
               <label
                 htmlFor="emailCaretaker"
-                className="block text-xl font-bold mb-1 text-slate-800 dark:text-slate-200"
+                className="block text-xl font-bold mb-1 text-slate-900 dark:text-slate-100"
               >
                 Caretaker Email (for schedule proposals &amp; missed doses)
               </label>
@@ -274,14 +289,14 @@ export default function SetupPage() {
                 value={emailCaretaker}
                 onChange={(e) => setEmailCaretaker(e.target.value)}
                 placeholder="caretaker@example.com"
-                className="w-full min-h-[52px] px-4 text-xl rounded-2xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus-visible:ring-4 focus-visible:ring-blue-600"
+                className="w-full min-h-[52px] px-4 text-xl font-semibold rounded-2xl border-2 border-slate-500 dark:border-slate-400 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus-visible:ring-3 focus-visible:ring-offset-2 focus-visible:ring-sky-600 dark:focus-visible:ring-sky-400 focus-visible:border-sky-600 transition-colors duration-150 motion-reduce:transition-none"
               />
             </div>
 
             <div>
               <label
                 htmlFor="emailFamily"
-                className="block text-xl font-bold mb-1 text-slate-800 dark:text-slate-200"
+                className="block text-xl font-bold mb-1 text-slate-900 dark:text-slate-100"
               >
                 Family Email (for weekly digest &amp; escalation)
               </label>
@@ -292,16 +307,19 @@ export default function SetupPage() {
                 value={emailFamily}
                 onChange={(e) => setEmailFamily(e.target.value)}
                 placeholder="family@example.com"
-                className="w-full min-h-[52px] px-4 text-xl rounded-2xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus-visible:ring-4 focus-visible:ring-blue-600"
+                className="w-full min-h-[52px] px-4 text-xl font-semibold rounded-2xl border-2 border-slate-500 dark:border-slate-400 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus-visible:ring-3 focus-visible:ring-offset-2 focus-visible:ring-sky-600 dark:focus-visible:ring-sky-400 focus-visible:border-sky-600 transition-colors duration-150 motion-reduce:transition-none"
               />
             </div>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 border-b pb-2 border-slate-200 dark:border-slate-800">
-              3. Passcodes (6 or more numbers)
-            </h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400">
+            <div className="flex items-center gap-2 border-b-2 pb-2 border-slate-300 dark:border-slate-700">
+              <ShieldCheckIcon className="w-6 h-6 text-sky-700 dark:text-sky-400" />
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                3. Passcodes (6 or more numbers)
+              </h2>
+            </div>
+            <p className="text-lg font-medium text-slate-700 dark:text-slate-300">
               Each passcode must be unique. The Elder passcode has authority to approve
               changes.
             </p>
@@ -309,7 +327,7 @@ export default function SetupPage() {
             <div>
               <label
                 htmlFor="passcodeElder"
-                className="block text-xl font-bold mb-1 text-slate-800 dark:text-slate-200"
+                className="block text-xl font-bold mb-1 text-slate-900 dark:text-slate-100"
               >
                 Elder Passcode
               </label>
@@ -322,14 +340,14 @@ export default function SetupPage() {
                 value={passcodeElder}
                 onChange={(e) => setPasscodeElder(e.target.value)}
                 placeholder="6+ digits"
-                className="w-full min-h-[52px] px-4 text-xl rounded-2xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus-visible:ring-4 focus-visible:ring-blue-600"
+                className="w-full min-h-[52px] px-4 text-xl font-semibold rounded-2xl border-2 border-slate-500 dark:border-slate-400 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus-visible:ring-3 focus-visible:ring-offset-2 focus-visible:ring-sky-600 dark:focus-visible:ring-sky-400 focus-visible:border-sky-600 transition-colors duration-150 motion-reduce:transition-none"
               />
             </div>
 
             <div>
               <label
                 htmlFor="passcodeCaretaker"
-                className="block text-xl font-bold mb-1 text-slate-800 dark:text-slate-200"
+                className="block text-xl font-bold mb-1 text-slate-900 dark:text-slate-100"
               >
                 Caretaker Passcode
               </label>
@@ -342,14 +360,14 @@ export default function SetupPage() {
                 value={passcodeCaretaker}
                 onChange={(e) => setPasscodeCaretaker(e.target.value)}
                 placeholder="6+ digits"
-                className="w-full min-h-[52px] px-4 text-xl rounded-2xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus-visible:ring-4 focus-visible:ring-blue-600"
+                className="w-full min-h-[52px] px-4 text-xl font-semibold rounded-2xl border-2 border-slate-500 dark:border-slate-400 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus-visible:ring-3 focus-visible:ring-offset-2 focus-visible:ring-sky-600 dark:focus-visible:ring-sky-400 focus-visible:border-sky-600 transition-colors duration-150 motion-reduce:transition-none"
               />
             </div>
 
             <div>
               <label
                 htmlFor="passcodeFamily"
-                className="block text-xl font-bold mb-1 text-slate-800 dark:text-slate-200"
+                className="block text-xl font-bold mb-1 text-slate-900 dark:text-slate-100"
               >
                 Family Passcode
               </label>
@@ -362,24 +380,25 @@ export default function SetupPage() {
                 value={passcodeFamily}
                 onChange={(e) => setPasscodeFamily(e.target.value)}
                 placeholder="6+ digits"
-                className="w-full min-h-[52px] px-4 text-xl rounded-2xl border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus-visible:ring-4 focus-visible:ring-blue-600"
+                className="w-full min-h-[52px] px-4 text-xl font-semibold rounded-2xl border-2 border-slate-500 dark:border-slate-400 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus-visible:ring-3 focus-visible:ring-offset-2 focus-visible:ring-sky-600 dark:focus-visible:ring-sky-400 focus-visible:border-sky-600 transition-colors duration-150 motion-reduce:transition-none"
               />
             </div>
           </section>
 
+          {/* Primary Action Button: Green background with Black text per strict override */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full min-h-[56px] text-xl font-bold rounded-2xl bg-blue-700 hover:bg-blue-800 text-white shadow-lg transition-colors duration-150 disabled:opacity-50 focus-visible:ring-4 focus-visible:ring-blue-600"
+            className="w-full min-h-[56px] text-xl font-black rounded-2xl bg-[#22C55E] dark:bg-[#4ADE80] hover:bg-[#16A34A] dark:hover:bg-[#22C55E] text-[#000000] border-2 border-[#15803D] dark:border-[#22C55E] shadow-sm transition-colors duration-150 motion-reduce:transition-none disabled:opacity-50 cursor-pointer focus-visible:ring-3 focus-visible:ring-offset-2 focus-visible:ring-sky-600 dark:focus-visible:ring-sky-400"
           >
             {loading ? 'Creating Profile...' : 'Complete Profile Setup'}
           </button>
         </form>
 
-        <footer className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 text-center">
+        <footer className="mt-8 pt-6 border-t-2 border-slate-200 dark:border-slate-800 text-center">
           <Link
             href="/login"
-            className="text-lg font-semibold text-blue-700 dark:text-blue-400 underline underline-offset-4 rounded-xl py-2 px-3 focus-visible:ring-2 focus-visible:ring-blue-600"
+            className="text-lg font-bold text-[#0369A1] dark:text-[#38BDF8] underline underline-offset-4 rounded-xl py-2 px-3 hover:bg-sky-50 dark:hover:bg-slate-800/60 cursor-pointer focus-visible:ring-3 focus-visible:ring-sky-600 transition-colors duration-150 motion-reduce:transition-none"
           >
             Already have a profile code? Sign In
           </Link>

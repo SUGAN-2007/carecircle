@@ -1,5 +1,13 @@
 import type { Metadata } from 'next';
+import { Atkinson_Hyperlegible } from 'next/font/google';
 import './globals.css';
+
+const atkinson = Atkinson_Hyperlegible({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-atkinson',
+});
 
 export const metadata: Metadata = {
   title: {
@@ -17,12 +25,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    /*
-     * lang="en" is required for screen readers (WCAG 3.1.1).
-     * The `dark` class is toggled by the client-side theme toggle in Phase 3.
-     */
     <html lang="en">
-      <body className="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased">
+      <body className={`${atkinson.variable} ${atkinson.className} bg-[#F0F9FF] dark:bg-[#0B132B] text-slate-900 dark:text-slate-100 antialiased`}>
         {/* Skip-navigation link — first focusable element for keyboard users */}
         <a href="#main-content" className="skip-nav">
           Skip to main content

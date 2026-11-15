@@ -2,21 +2,101 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Global accessibility defaults ───────────────────────────────────────── */
+/* ── CareCircle Accessible Design Tokens ───────────────────────────────── */
 :root {
   /* 18px base font per elder-accessible-ui rules */
   font-size: 18px;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-atkinson), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+
+  /* Theme Tokens — Light Mode (Calm Healthcare Palette) */
+  --color-primary: #0369a1;
+  --color-on-primary: #ffffff;
+  --color-secondary: #0284c7;
+  --color-on-secondary: #ffffff;
+
+  /* Primary Action Button: Green with Black text per strict override */
+  --color-accent: #22c55e;
+  --color-accent-hover: #16a34a;
+  --color-on-accent: #000000;
+
+  --color-background: #f0f9ff;
+  --color-foreground: #0c4a6e;
+  --color-card: #ffffff;
+  --color-card-foreground: #0f172a;
+  --color-muted: #e2e8f0;
+  --color-muted-foreground: #334155;
+
+  /* Slate-500 level border guarantees ≥ 3:1 contrast against controls & surfaces */
+  --color-border: #64748b;
+  --color-border-subtle: #94a3b8;
+
+  --color-destructive: #dc2626;
+  --color-on-destructive: #ffffff;
+  --color-ring: #0284c7;
 }
 
-/* Visible focus ring for keyboard navigation */
+/* Theme Tokens — Dark Mode via prefers-color-scheme */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary: #38bdf8;
+    --color-on-primary: #082f49;
+    --color-secondary: #0284c7;
+    --color-on-secondary: #ffffff;
+
+    --color-accent: #4ade80;
+    --color-accent-hover: #22c55e;
+    --color-on-accent: #000000;
+
+    --color-background: #0b132b;
+    --color-foreground: #f0f9ff;
+    --color-card: #16223f;
+    --color-card-foreground: #f8fafc;
+    --color-muted: #1e293b;
+    --color-muted-foreground: #cbd5e1;
+
+    --color-border: #64748b;
+    --color-border-subtle: #475569;
+
+    --color-destructive: #ef4444;
+    --color-on-destructive: #ffffff;
+    --color-ring: #38bdf8;
+  }
+}
+
+/* Theme Tokens — Dark Mode via explicit .dark class */
+.dark {
+  --color-primary: #38bdf8;
+  --color-on-primary: #082f49;
+  --color-secondary: #0284c7;
+  --color-on-secondary: #ffffff;
+
+  --color-accent: #4ade80;
+  --color-accent-hover: #22c55e;
+  --color-on-accent: #000000;
+
+  --color-background: #0b132b;
+  --color-foreground: #f0f9ff;
+  --color-card: #16223f;
+  --color-card-foreground: #f8fafc;
+  --color-muted: #1e293b;
+  --color-muted-foreground: #cbd5e1;
+
+  --color-border: #64748b;
+  --color-border-subtle: #475569;
+
+  --color-destructive: #ef4444;
+  --color-on-destructive: #ffffff;
+  --color-ring: #38bdf8;
+}
+
+/* Visible 3px focus ring with 2px offset for keyboard navigation */
 :focus-visible {
-  outline: 3px solid #2563eb;
-  outline-offset: 3px;
+  outline: 3px solid var(--color-ring);
+  outline-offset: 2px;
 }
 
-/* Remove spinner arrows from number inputs (but keep accessible) */
+/* Remove spinner arrows from number inputs (keep accessible) */
 input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -42,11 +122,12 @@ html {
   position: absolute;
   left: -9999px;
   z-index: 9999;
-  padding: 0.5rem 1rem;
-  background: #1e40af;
-  color: #fff;
-  font-weight: 600;
-  border-radius: 0 0 4px 0;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 700;
+  font-size: 1.125rem;
+  border-radius: 0 0 8px 0;
   text-decoration: none;
 }
 .skip-nav:focus {
