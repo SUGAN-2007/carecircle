@@ -346,6 +346,8 @@ describe('Reminder Engine & Cron Dispatcher', () => {
                     {
                       data: () => ({
                         id: 'm-inactive',
+                        name: 'Inactive Med',
+                        dose: '10mg',
                         active: false,
                         scheduleTimes: ['08:00'],
                         startDate: '2026-11-01',
@@ -355,6 +357,8 @@ describe('Reminder Engine & Cron Dispatcher', () => {
                     {
                       data: () => ({
                         id: 'm-future',
+                        name: 'Future Med',
+                        dose: '10mg',
                         active: true,
                         scheduleTimes: ['08:00'],
                         startDate: '2026-12-01',
@@ -364,6 +368,8 @@ describe('Reminder Engine & Cron Dispatcher', () => {
                     {
                       data: () => ({
                         id: 'm-past',
+                        name: 'Past Med',
+                        dose: '10mg',
                         active: true,
                         scheduleTimes: ['08:00'],
                         startDate: '2026-10-01',
@@ -384,6 +390,12 @@ describe('Reminder Engine & Cron Dispatcher', () => {
         }
         return { doc: () => ({ get: async () => ({ exists: false }) }) };
       },
+      runTransaction: async (fn: any) =>
+        fn({
+          get: async () => ({ exists: false }),
+          set: () => {},
+          update: () => {},
+        }),
     };
 
     vi.spyOn(firebaseModule, 'getFirestore').mockReturnValue(mockDb);
@@ -456,6 +468,7 @@ describe('Reminder Engine & Cron Dispatcher', () => {
         if (colName === 'reminderLog') {
           return {
             doc: (id: string) => ({
+              id,
               update: async (data: any) => reminderDocs.set(id, data),
             }),
           };

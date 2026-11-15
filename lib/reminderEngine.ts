@@ -273,6 +273,7 @@ export async function runReminderTick(now = new Date()): Promise<TickResult> {
     const todayStr = formatInTimeZone(now, timezone, 'yyyy-MM-dd');
 
     for (const med of medications) {
+      if (!med.active) continue;
       if (todayStr < med.startDate) continue;
       if (med.endDate && todayStr > med.endDate) continue;
 

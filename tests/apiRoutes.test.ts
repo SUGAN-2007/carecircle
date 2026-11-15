@@ -24,19 +24,45 @@ vi.mock('@/lib/firebase', () => ({
 describe('API Route Handlers (Auth, Meds, Cron, Action, Profiles)', () => {
   const profileId = 'prof-api-1';
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.restoreAllMocks();
+    const { getFirestore } = await import('@/lib/firebase');
+    const mockDb: any = {
+      collection: () => ({
+        doc: () => ({
+          get: async () => ({ exists: false, data: () => ({ sessionVersion: 1 }) }),
+          set: async () => undefined,
+          update: async () => undefined,
+        }),
+        where: () => ({
+          limit: () => ({
+            get: async () => ({ empty: true, docs: [] }),
+          }),
+          get: async () => ({ empty: true, docs: [] }),
+        }),
+        add: async () => ({ id: 'new-id' }),
+      }),
+      runTransaction: async (fn: any) =>
+        fn({
+          get: async () => ({ exists: false }),
+          set: async () => undefined,
+          update: async () => undefined,
+        }),
+    };
+    (getFirestore as any).mockReturnValue(mockDb);
   });
 
   describe('/api/auth/login', () => {
-    it('returns 400 for missing code or passcode', async () => {
+    it('returns 401 generic error for missing code or passcode (anti-enumeration)', async () => {
       const req = new NextRequest('http://localhost:3000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profileCode: '' }),
       });
       const res = await loginPost(req);
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(401);
+      const data = await res.json();
+      expect(data.error).toMatch(/Invalid profile code or passcode/i);
     });
 
     it('returns generic error when profile is not found, executing dummy compare', async () => {
@@ -47,8 +73,17 @@ describe('API Route Handlers (Auth, Meds, Cron, Action, Profiles)', () => {
         collection: (col: string) => {
           if (col === 'rateLimits') return { doc: () => ({ get: () => Promise.resolve({ exists: false }) }) };
           if (col === 'profiles') return { where: () => ({ limit: () => ({ get: () => Promise.resolve({ empty: true }) }) }) };
-          return { doc: () => ({ get: () => Promise.resolve({ exists: false }) }) };
+          return {
+            doc: () => ({ get: () => Promise.resolve({ exists: false }) }),
+            add: () => Promise.resolve({ id: 'audit-1' }),
+          };
         },
+        runTransaction: async (fn: any) =>
+          fn({
+            get: async () => ({ exists: false }),
+            set: async () => undefined,
+            update: async () => undefined,
+          }),
       });
 
       const req = new NextRequest('http://localhost:3000/api/auth/login', {
@@ -79,7 +114,7 @@ describe('API Route Handlers (Auth, Meds, Cron, Action, Profiles)', () => {
     it('allows Elder to rotate passcodes', async () => {
       vi.spyOn(authModule, 'requireRole').mockResolvedValue({
         success: true,
-        session: { profileId, role: 'elder', sessionVersion: 1, timezone: 'Asia/Kolkata' },
+        session: { profileId, role: 'elder', sessionVersion: 1, timezone: 'Asia/Kolkata', name: 'Margaret' },
       });
       vi.spyOn(authModule, 'checkCsrfOrigin').mockReturnValue(true);
 
@@ -88,6 +123,7 @@ describe('API Route Handlers (Auth, Meds, Cron, Action, Profiles)', () => {
       (getFirestore as any).mockReturnValue({
         collection: () => ({
           doc: () => ({
+            get: async () => ({ exists: true, data: () => ({ sessionVersion: 1 }) }),
             update: mockUpdate,
             set: mockUpdate,
           }),
@@ -105,7 +141,7 @@ describe('API Route Handlers (Auth, Meds, Cron, Action, Profiles)', () => {
       expect(res.status).toBe(200);
       const data = await res.json();
       expect(data.success).toBe(true);
-      expect(data.targetRole).toBe('caretaker');
+      expect(data.message).toContain('caretaker');
     });
   });
 
@@ -113,7 +149,7 @@ describe('API Route Handlers (Auth, Meds, Cron, Action, Profiles)', () => {
     it('GET returns active medications for profile', async () => {
       vi.spyOn(authModule, 'requireRole').mockResolvedValue({
         success: true,
-        session: { profileId, role: 'family', sessionVersion: 1, timezone: 'Asia/Kolkata' },
+        session: { profileId, role: 'family', sessionVersion: 1, timezone: 'Asia/Kolkata', name: 'John' },
       });
       vi.spyOn(medicationsModule, 'getActiveMedications').mockResolvedValue([
         {
@@ -142,7 +178,7 @@ describe('API Route Handlers (Auth, Meds, Cron, Action, Profiles)', () => {
     it('POST with Caretaker role routes proposal to pending changes', async () => {
       vi.spyOn(authModule, 'requireRole').mockResolvedValue({
         success: true,
-        session: { profileId, role: 'caretaker', sessionVersion: 1, timezone: 'Asia/Kolkata' },
+        session: { profileId, role: 'caretaker', sessionVersion: 1, timezone: 'Asia/Kolkata', name: 'Nurse Sarah' },
       });
       vi.spyOn(authModule, 'checkCsrfOrigin').mockReturnValue(true);
 
@@ -170,7 +206,8 @@ describe('API Route Handlers (Auth, Meds, Cron, Action, Profiles)', () => {
       const res = await medPost(req);
       expect(res.status).toBe(202);
       const data = await res.json();
-      expect(data.pending).toBe(true);
+      expect(data.status).toBe('pending_approval');
+      expect(data.pendingChangeId).toBeDefined();
     });
   });
 
@@ -178,7 +215,7 @@ describe('API Route Handlers (Auth, Meds, Cron, Action, Profiles)', () => {
     it('logs dose taken and returns remaining count', async () => {
       vi.spyOn(authModule, 'requireRole').mockResolvedValue({
         success: true,
-        session: { profileId, role: 'elder', sessionVersion: 1, timezone: 'Asia/Kolkata' },
+        session: { profileId, role: 'elder', sessionVersion: 1, timezone: 'Asia/Kolkata', name: 'Margaret' },
       });
       vi.spyOn(authModule, 'checkCsrfOrigin').mockReturnValue(true);
 
@@ -272,7 +309,7 @@ describe('API Route Handlers (Auth, Meds, Cron, Action, Profiles)', () => {
     it('GET returns current escalation settings for Elder', async () => {
       vi.spyOn(authModule, 'requireRole').mockResolvedValue({
         success: true,
-        session: { profileId, role: 'elder', sessionVersion: 1, timezone: 'Asia/Kolkata' },
+        session: { profileId, role: 'elder', sessionVersion: 1, timezone: 'Asia/Kolkata', name: 'Margaret' },
       });
 
       const { getFirestore } = await import('@/lib/firebase');
@@ -299,7 +336,7 @@ describe('API Route Handlers (Auth, Meds, Cron, Action, Profiles)', () => {
     it('POST updates escalation settings with validation', async () => {
       vi.spyOn(authModule, 'requireRole').mockResolvedValue({
         success: true,
-        session: { profileId, role: 'elder', sessionVersion: 1, timezone: 'Asia/Kolkata' },
+        session: { profileId, role: 'elder', sessionVersion: 1, timezone: 'Asia/Kolkata', name: 'Margaret' },
       });
 
       const { getFirestore } = await import('@/lib/firebase');

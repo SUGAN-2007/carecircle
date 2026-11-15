@@ -228,7 +228,7 @@ export default function ElderTodayDashboard() {
                 onClick={() => setActiveExplanation(null)}
                 className="min-h-[48px] px-4 py-1 text-base font-bold bg-white dark:bg-slate-800 rounded-xl border border-blue-300"
               >
-                Close ✕
+                Close <span aria-hidden="true">✕</span>
               </button>
             </div>
             <p className="text-xl font-medium leading-relaxed">
